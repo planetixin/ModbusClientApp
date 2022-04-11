@@ -26,7 +26,7 @@ private:
 	int startRegister = 0;
 	int page = 1;
 
-	int protocol = 502;
+	int port = 502;
 	int width = 2;
 	int height = 20;
 
@@ -34,7 +34,7 @@ private:
 	std::string IP;
 	std::vector<int> registers;
 
-	modbus mb = modbus(IP, protocol);
+	modbus mb = modbus(IP, port);
 
 	bool showWindow = true;
 };

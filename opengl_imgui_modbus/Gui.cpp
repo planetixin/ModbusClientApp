@@ -48,16 +48,22 @@ void Gui::MenuBar()
 	if (ImGui::BeginMenu("File"))
 	{
 		if (ImGui::MenuItem("Save"))
-			std::cout << "save";
+		{
+			ImGui::EndMenu();
+
+		}
+			//std::cout << "save";
 		// Exit...
-		ImGui::EndMenu();
 	}
 	if (ImGui::BeginMenu("Edit"))
 	{
 		if (ImGui::MenuItem("Propeties"))
-			std::cout << "propeties";
+		{
+			ImGui::EndMenu();
+
+		}
+			//std::cout << "propeties";
 		// Exit...
-		ImGui::EndMenu();
 	}
 	ImGui::EndMainMenuBar();
 }
@@ -70,7 +76,7 @@ void Gui::upperWindow()
 	{
 		ImGui::Begin("Ip setting", &showWindow);
 
-		ImGui::InputInt("protocol", &protocol, 0);
+		ImGui::InputInt("port", &port, 0);
 
 		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.15f);
 		ImGui::InputInt("##1", &octans[0], 0);
@@ -94,7 +100,7 @@ void Gui::upperWindow()
 		{
 			SetIP();
 
-			std::cout << Connect() << '\n';
+			Connect();
 		}
 		ImGui::End();
 	}
@@ -183,7 +189,7 @@ bool Gui::SetIP()
 bool Gui::Connect()
 {
 	bool result;
-	mb = modbus(IP, protocol);
+	mb = modbus(IP, port);
 	mb.modbus_set_slave_id(0);
 	result = mb.modbus_connect();
 	return result;
