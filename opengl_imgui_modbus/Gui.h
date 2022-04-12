@@ -32,7 +32,8 @@ private:
 
 	int octans[4] = { 192, 168, 0, 1 };
 	std::string IP;
-	std::vector<int> registers;
+	uint16_t* registers = new uint16_t[width*height]();
+	//std::vector<int> registers;
 
 	modbus mb = modbus(IP, port);
 

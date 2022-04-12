@@ -12,15 +12,15 @@ Gui::Gui(GLFWwindow* window) : window(window)
 
 
 	mb.modbus_connect();
-	for (int row = 0; row < 100; row++)
-	{
+	//for (int row = 0; row < 100; row++)
+	//{
 
-		for (int collumn = 0; collumn < width; collumn++)
-		{
-			registers.push_back(0);
+	//	for (int collumn = 0; collumn < width; collumn++)
+	//	{
+	//		//registers.push_back(0);
 
-		}
-	}
+	//	}
+	//}
 }
 
 Gui::~Gui()
@@ -60,7 +60,6 @@ void Gui::MenuBar()
 		if (ImGui::MenuItem("Propeties"))
 		{
 			ImGui::EndMenu();
-
 		}
 			//std::cout << "propeties";
 		// Exit...
@@ -120,19 +119,30 @@ void Gui::RegisterWindow()
 	if (ImGui::Button(">"))
 		page++;
 
+	int size = width * height;
+	int address = startRegister + (page - 1) * size;
+	
+	int sizeo = (sizeof(registers) / sizeof(*registers));
+	if(sizeo != width* height)
+		registers = new uint16_t[width * height]();
+	mb.modbus_set_slave_id(0);
+	mb.modbus_read_holding_registers(address, size, registers);
+
 
 	//--table-----------------------------------------//
 	ImGui::BeginTable("table", width*2, 0);
 
 	for (int row = 0; row < height; row++)
 	{
-	
 		ImGui::TableNextRow();
 		
 		for (int collumn = 0; collumn < width; collumn++)
 		{
+
+
 			int place = row + collumn * height;
-			int rplace = place + startRegister + (page-1) * height * width;
+			int rplace = place + address;
+
 
 			ImGui::TableNextColumn();
 
@@ -141,26 +151,29 @@ void Gui::RegisterWindow()
 			rs << rplace;
 			ImGui::Text(rs.str().c_str());
 			ImGui::TableNextColumn();
-			mb.modbus_set_slave_id(0);
 
-
-			uint16_t value[1];
-			mb.modbus_read_holding_registers(rplace, 1, value);
-			if (!registers[place])
-				registers.push_back(0);
-
-			registers[place] = value[0];
-
+			
 			std::stringstream ss;
-			ss << "##" << row << '_' << collumn;
-			ImGui::InputInt(ss.str().c_str(), &registers[place], 0);
+			ss << "##" << row << ',' << collumn;
+			int v = registers[place];
+			ImGui::InputInt(ss.str().c_str(), &v, 0);
+			if (v != registers[place])
+			{
+				registers[place] = v;
+				mb.modbus_write_register(place, registers[place]);
+
+			}
+				
+
+
 			//net.SetRegister(row, collumn, net.registers[place]);
-			mb.modbus_write_register(rplace, registers[place]);
 			
 			//net.SetRegister(row, net.registers[collumn + row * net.width]);
 
 		}
 	}
+	//mb.modbus_write_registers(address, size, registers);
+
 	//net.SetRegisters();
 	//net.SetRegister(0, 1, 20);
 	//net.GetRegisters();
